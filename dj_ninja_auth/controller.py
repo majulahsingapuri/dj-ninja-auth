@@ -1,8 +1,15 @@
 from django.contrib.auth import login as django_login
 from django.contrib.auth import logout as django_logout
-from ninja_extra import ControllerBase, api_controller, http_generic, http_post
+from ninja_extra import (
+    ControllerBase,
+    api_controller,
+    http_generic,
+    http_get,
+    http_post,
+)
 from ninja_extra.permissions import AllowAny, IsAuthenticated
 
+from .schema import AuthUserSchema
 from .schema_control import SchemaControl
 
 schema = SchemaControl()
@@ -77,11 +84,25 @@ class PasswordChangeController(ControllerBase):
         return passwords.to_response_schema()
 
 
+class UserController(ControllerBase):
+    auto_import = False
+
+    @http_get(
+        "/me",
+        permissions=[IsAuthenticated],
+        response={200: AuthUserSchema},
+        url_name="get_user",
+    )
+    def get_me(self):
+        return self.context.request.auth
+
+
 # For session Authentication, requires `csrf=True`. See https://github.com/vitalik/django-ninja/issues/8
 @api_controller("/auth", permissions=[AllowAny], tags=["auth"])
 class NinjaAuthDefaultController(
     AuthenticationController,
     PasswordResetController,
     PasswordChangeController,
+    UserController,
 ):
     auto_import = False

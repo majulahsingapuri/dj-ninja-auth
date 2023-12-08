@@ -24,6 +24,7 @@ class AppSettings(object):
         assert isinstance(self.ISSUER, (str, type(None)))
         assert isinstance(self.AUDIENCE, (str, type(None)))
         assert isinstance(self.VERIFYING_KEY, (str, type(None)))
+        assert isinstance(self.SIGNING_KEY, str)
         assert type(self.UPDATE_LAST_LOGIN) == bool
         assert isinstance(self.ALGORITHM, str)
         assert isinstance(self.ACCESS_TOKEN_LIFETIME, timedelta)

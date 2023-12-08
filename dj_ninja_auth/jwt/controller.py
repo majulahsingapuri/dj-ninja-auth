@@ -6,6 +6,7 @@ from ..controller import (
     AuthenticationController,
     PasswordChangeController,
     PasswordResetController,
+    UserController,
 )
 from ..schema_control import SchemaControl
 from .schema_control import JWTSchemaControl
@@ -65,5 +66,6 @@ class NinjaAuthJWTController(
     PasswordChangeController,
     JWTTokenRefreshController,
     JWTTokenVerificationController,
+    UserController,
 ):
     auto_import = False

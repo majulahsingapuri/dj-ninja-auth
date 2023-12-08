@@ -1,8 +1,9 @@
 from calendar import timegm
+from datetime import timezone
 from functools import wraps
 
 from django.conf import settings
-from django.utils.timezone import datetime, is_naive, make_aware, utc
+from django.utils.timezone import datetime, is_naive, make_aware
 
 from . import exceptions
 
@@ -22,7 +23,7 @@ def token_error(func):
 
 def make_utc(dt):
     if settings.USE_TZ and is_naive(dt):
-        return make_aware(dt, timezone=utc)
+        return make_aware(dt, timezone=timezone.utc)
 
     return dt
 

@@ -6,6 +6,7 @@ from ..controller import (
     AuthenticationController,
     PasswordChangeController,
     PasswordResetController,
+    UserController,
 )
 from .schema_control import AuthTokenSchemaControl
 
@@ -31,5 +32,6 @@ class NinjaAuthTokenController(
     TokenAuthenticationController,
     PasswordResetController,
     PasswordChangeController,
+    UserController,
 ):
     auto_import = False

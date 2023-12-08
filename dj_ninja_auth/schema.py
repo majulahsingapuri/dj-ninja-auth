@@ -46,7 +46,7 @@ class SuccessOutputSchema(SuccessMessageMixin):
 class AuthUserSchema(ModelSchema):
     class Meta:
         model = UserModel
-        exclude = ["password", "groups", "user_permissions"]
+        exclude = ["password"]
 
 
 # Base Schemas
