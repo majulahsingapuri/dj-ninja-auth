@@ -1,46 +1,16 @@
 repos:
-- repo: https://github.com/pre-commit/pre-commit-hooks
-  rev:  v2.3.0
-  hooks:
-  - id: check-merge-conflict
-- repo: https://github.com/asottile/yesqa
-  rev: v1.3.0
-  hooks:
-  - id: yesqa
-- repo: local
-  hooks:
-    - id: code_formatting
-      args: []
-      name: Code Formatting
-      entry: "make fmt"
-      types: [python]
-      language_version: python3.8
-      language: python
-    - id: code_linting
-      args: [ ]
-      name: Code Linting
-      entry: "make lint"
-      types: [ python ]
-      language_version: python3.8
-      language: python
-- repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v2.3.0
-  hooks:
-  - id: end-of-file-fixer
-    exclude: >-
-      ^examples/[^/]*\.svg$
-  - id: requirements-txt-fixer
-  - id: trailing-whitespace
-    types: [python]
-  - id: check-case-conflict
-  - id: check-json
-  - id: check-xml
-  - id: check-executables-have-shebangs
-  - id: check-toml
-  - id: check-xml
-  - id: check-yaml
-  - id: debug-statements
-  - id: check-added-large-files
-  - id: check-symlinks
-  - id: debug-statements
-    exclude: ^tests/
+  - repo: https://github.com/psf/black
+    rev: 22.3.0
+    hooks:
+      - id: black
+        language_version: python3
+  - repo: https://github.com/pycqa/isort
+    rev: 5.10.1
+    hooks:
+      - id: isort
+  - repo: https://github.com/pycqa/flake8
+    rev: '4.0.1'
+    hooks:
+      - id: flake8
+        additional_dependencies:
+          - flake8-bugbear==21.4.3

@@ -1,4 +1,0 @@
-[run]
-omit =
-        ninja_jwt/token_blacklist/admin.py
-        ninja_jwt/token_blacklist/apps.py

@@ -1,6 +1,1 @@
-include README.rst
-include LICENSE.txt
-recursive-include ninja_jwt/locale *.mo
-recursive-include ninja_jwt/locale *.po
-recursive-exclude * __pycache__
-recursive-exclude * *.py[co]
+include README.md

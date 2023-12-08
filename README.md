@@ -1,119 +1,218 @@
-# Ninja JWT
-![Test](https://github.com/eadwinCode/django-ninja-jwt/workflows/Test/badge.svg)
-[![PyPI version](https://badge.fury.io/py/django-ninja-jwt.svg)](https://badge.fury.io/py/django-ninja-jwt)
-[![PyPI version](https://img.shields.io/pypi/v/django-ninja-jwt.svg)](https://pypi.python.org/pypi/django-ninja-jwt)
-[![PyPI version](https://img.shields.io/pypi/pyversions/django-ninja-jwt.svg)](https://pypi.python.org/pypi/django-ninja-jwt)
-[![PyPI version](https://img.shields.io/pypi/djversions/django-ninja-jwt.svg)](https://pypi.python.org/pypi/django-ninja-jwt)
-[![Codecov](https://img.shields.io/codecov/c/gh/eadwinCode/django-ninja-jwt)](https://codecov.io/gh/eadwinCode/django-ninja-jwt)
-[![Downloads](https://static.pepy.tech/badge/django-ninja-jwt)](https://pepy.tech/project/django-ninja-jwt)
+# Django Ninja Auth
 
+A one stop shop for all your Django-Ninja Authentication needs.
+Supports REST authentication with Sessions, Auth Tokens and JWTs.
 
-## Abstract
+Fully Customisable to suit your needs.
 
-Ninja JWT is JSON Web Token plugin for Django-Ninja. The library is a fork of [Simple JWT](https://github.com/jazzband/djangorestframework-simplejwt) by Jazzband, a popular  JWT plugin for [Django REST Framework](http://www.django-rest-framework.org).
+This repository does not fix any issues in SimpleJWT or django-ninja-jwt.
+It is intended to build upon the repository and add other forms of authentication on top of just JWTs
 
-#### Notice
-This library does not fix any issues from the source SIMPLE JWT. 
-It only added support for Django-Ninja and removes DRF dependencies. And time after time, subsequent updates from SIMPLE JWT will reflect here.
+## Getting Started
 
-For full documentation, [visit](https://eadwincode.github.io/django-ninja-jwt/).
+### Installation
 
-#### Requirements
-- Python >= 3.6
-- Django >= 2.1
-- Django-Ninja >= 0.16.1
-- Django-Ninja-Extra >= 0.14.2
-
-## Example
-Checkout this sample project: https://github.com/eadwinCode/bookstoreapi
-
-
-Installation
-============
-
-Ninja JWT can be installed with pip:
-
-    pip install django-ninja-jwt
-
-Also, you need to register `NinjaJWTDefaultController` controller to your Django-Ninja api.
-
-```python
-from ninja_jwt.controller import NinjaJWTDefaultController
-from ninja_extra import NinjaExtraAPI
-
-api = NinjaExtraAPI()
-api.register_controllers(NinjaJWTDefaultController)
-
+```bash
+pip install dj-ninja-auth
 ```
 
-The `NinjaJWTDefaultController` comes with three routes `obtain_token`, `refresh_token` and `verify_token`. 
-It is a combination of two subclasses `TokenVerificationController` and `TokenObtainPairController`.
-If you wish to customize these routes, you can inherit from these controllers and change its implementation
+### Setup
 
-```python
-from ninja_extra import api_controller
-from ninja_jwt.controller import TokenObtainPairController
+#### NinjaAPI
 
-@api_controller('token', tags=['Auth'])
-class MyCustomController(TokenObtainPairController):
-    """obtain_token and refresh_token only"
-...
-api.register_controllers(MyCustomController)
-```
+1. Create a `api.py` file in your app directory next to the `settings.py` and `urls.py` files.
+2. Add the following lines of code to your `api.py`
 
-If you wish to use localizations/translations, simply add `ninja_jwt` to
-`INSTALLED_APPS`.
+    ```python [api.py]
+    from ninja_extra import NinjaExtraAPI
+    from dj_ninja_auth.controller import NinjaAuthDefaultController
 
-```python
-INSTALLED_APPS = [
-    ...
-    'ninja_jwt',
-    ...
+    api = NinjaExtraAPI()
+    api.register_controllers(NinjaAuthDefaultController)
+    ```
+
+3. Add the following lines to your `urls.py` file
+
+    ```python [urls.py]
+    from .api import api
+
+    urlpatterns = [
+        path("admin/", admin.site.urls),
+        path("", api.urls)
+    ]
+    ```
+
+This will give you 5 basic endpoints that are not secured and can be called by anyone.
+The endpoints are
+
+- `/auth/login`
+- `/auth/logout`
+- `/auth/password/reset/request`
+- `/auth/password/reset/confirm`
+- `/auth/password/change`
+
+#### Password Reset Template
+
+Django's default email template requires a `password_reset_confirm` reverse url that is incompatible with Django Ninja's [namespace convention](https://django-ninja.dev/guides/urls/) and will throw [this error](https://github.com/iMerica/dj-rest-auth/issues/494) if not handled properly.
+As a workaround, it is required that you provide your own email reset template.
+You can place it anywhere in your project as long as you link it in your `settings.py`'s `TEMPLATES` variable.
+In my example below, I have put it in the `{$project_root}/templates/` directory.
+
+```python [settings.py]
+TEMPLATES = [
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [BASE_DIR / "templates"],
+        "APP_DIRS": True,
+        "OPTIONS": { ... },
+    },
 ]
 ```
 
-## Using Ninja Router
-Also, if you are not interested in following NinjaExtra methodology, check out this doc on how to use `Ninja-JWT` with `Django-Ninja` [here](https://eadwincode.github.io/django-ninja-jwt/customizing_token_claims/#use-django-ninja-router)
+In your `templates` directory, create the following file at `templates/registration/password_reset_email.html` and **minimally** add the following.
 
-Usage
-=====
+```jinja [password_reset_email.html]
+{% load i18n %}
+{% autoescape off %}
 
-To verify that Ninja JWT is working, you can use curl to issue a couple
-of test requests:
+    {% translate "Please go to the following page and choose a new password:" %}
 
-``` {.sourceCode .bash}
-curl \
-  -X POST \
-  -H "Content-Type: application/json" \
-  -d '{"username": "davidattenborough", "password": "boatymcboatface"}' \
-  http://localhost:8000/api/token/pair
+    {% block reset_link %}
+        http://{YOUR_DOMAIN_HERE}/{YOUR_FRONTEND_PASSWORD_RESET_ENDPOINT}?uid={{ uid }}&token={{ token }}
+    {% endblock %}
 
-...
-{
-  "access":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX3BrIjoxLCJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiY29sZF9zdHVmZiI6IuKYgyIsImV4cCI6MTIzNDU2LCJqdGkiOiJmZDJmOWQ1ZTFhN2M0MmU4OTQ5MzVlMzYyYmNhOGJjYSJ9.NHlztMGER7UADHZJlxNG0WSi22a2KaYSfd1S-AuT7lU",
-  "refresh":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX3BrIjoxLCJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImNvbGRfc3R1ZmYiOiLimIMiLCJleHAiOjIzNDU2NywianRpIjoiZGUxMmY0ZTY3MDY4NDI3ODg5ZjE1YWMyNzcwZGEwNTEifQ.aEoAYkSJjoWH1boshQAaTkf8G3yn0kapko6HFRt7Rh4"
-}
+{% endautoescape %}
 ```
 
-You can use the returned access token to prove authentication for a
-protected view:
+**NOTE**: Replace `YOUR_DOMAIN_HERE` and `YOUR_FRONTEND_PASSWORD_RESET_ENDPOINT` with values that correspond to your setup.
+The `uid` and `token` variables have to be passed to the backend for verification before the password can be changed.
 
-``` {.sourceCode .bash}
-curl \
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX3BrIjoxLCJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiY29sZF9zdHVmZiI6IuKYgyIsImV4cCI6MTIzNDU2LCJqdGkiOiJmZDJmOWQ1ZTFhN2M0MmU4OTQ5MzVlMzYyYmNhOGJjYSJ9.NHlztMGER7UADHZJlxNG0WSi22a2KaYSfd1S-AuT7lU" \
-  http://localhost:8000/api/some-protected-view/
+## Authentication
+
+There are 3 controllers that you can register in your `api.py` file for your application depending on your authentication needs.
+
+### Session
+
+The easiest way to use authentication is to use the Session Authentication.
+Note that the `csrf=True` kwarg has to be passed in to allow Django Ninja to pass CSRF cookies for validation.
+You will have to [provide your own endpoint](https://django-ninja.dev/reference/csrf/?h=csrf#django-ensure_csrf_cookie-decorator) to get a CSRF cookie from Ninja.
+
+```python [api.py]
+from ninja.security import django_auth
+from dj_ninja_auth.controller import NinjaAuthDefaultController
+
+api = NinjaExtraAPI(auth=[django_auth], csrf=True)
+api.register_controllers(NinjaAuthDefaultController)
 ```
 
-When this short-lived access token expires, you can use the longer-lived
-refresh token to obtain another access token:
+### Token
 
-``` {.sourceCode .bash}
-curl \
-  -X POST \
-  -H "Content-Type: application/json" \
-  -d '{"refresh":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX3BrIjoxLCJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImNvbGRfc3R1ZmYiOiLimIMiLCJleHAiOjIzNDU2NywianRpIjoiZGUxMmY0ZTY3MDY4NDI3ODg5ZjE1YWMyNzcwZGEwNTEifQ.aEoAYkSJjoWH1boshQAaTkf8G3yn0kapko6HFRt7Rh4"}' \
-  http://localhost:8000/api/token/refresh/
+Since the `token`s will be stored in the database, you are required to add the `dj_ninja_auth.authtoken` app to your `INSTALLED_APPS` and migrate the database.
 
-...
-{"access":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX3BrIjoxLCJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiY29sZF9zdHVmZiI6IuKYgyIsImV4cCI6MTIzNTY3LCJqdGkiOiJjNzE4ZTVkNjgzZWQ0NTQyYTU0NWJkM2VmMGI0ZGQ0ZSJ9.ekxRxgb9OKmHkfy-zs1Ro_xs1eMLXiR17dIDBVxeT-w"}
+```python
+from ninja_extra import NinjaExtraAPI
+from dj_ninja_auth.authtoken.authentication import AccessTokenAuth
+from dj_ninja_auth.authtoken.controller import NinjaAuthTokenController
+
+api = NinjaExtraAPI(auth=[AccessTokenAuth()])
+api.register_controllers(NinjaAuthTokenController)
+```
+
+### JWT
+
+```python
+from ninja_extra import NinjaExtraAPI
+from dj_ninja_auth.jwt.authentication import JWTAuth
+from dj_ninja_auth.jwt.controller import NinjaAuthJWTController
+
+api = NinjaExtraAPI(auth=[JWTAuth()])
+api.register_controllers(NinjaAuthJWTController)
+```
+
+The JWT controller provides 2 additional endpoints for tokens.
+
+- `/auth/refresh`
+- `/auth/verify`
+
+## Customisation
+
+Every aspect of the the `Schema`s and `Controller`s can be modified to suit your needs.
+
+### Schema
+
+Say for example you want to modify the output schema once the user logs in in your app `my_app` to only display specific fields.
+In your `my_app.schema.py`, you can create the following:
+
+```python [schema.py]
+from django.contrib.auth import authenticate, get_user_model
+from dj_ninja_auth.schema import SuccessMessageMixin, LoginInputSchema
+
+UserModel = get_user_model()
+
+class MyAuthUserSchema(ModelSchema):
+    class Meta:
+        model = UserModel
+        fields = ['id', 'username', 'first_name', 'last_name']
+
+class MyLoginOutputSchema(SuccessMessageMixin):
+    user: MyAuthUserSchema
+    my_other_value: str
+
+class MyLoginInputSchema(LoginInputSchema):
+    @classmethod
+    def get_response_schema(cls) -> Type[Schema]:
+        return MyLoginOutputSchema
+
+    def to_response_schema(self, **kwargs):
+        return super().to_response_schema(my_other_value="foo", **kwargs)
+```
+
+Then in your `settings.py`, you can specify:
+
+```python [settings.py]
+NINJA_AUTH_LOGIN_INPUT_SCHEMA = "my_app.schema.MyLoginInputSchema"
+```
+
+### Controller
+
+Say you wanted to add another endpoint to the default auth controller that is an authenticated route and returns the user's details in the schema defined above.
+In your `controller.py`:
+
+```python [controller.py]
+from ninja_extra import ControllerBase, api_controller, http_get
+from ninja_extra.permissions import IsAuthenticated
+
+from .schema import MyAuthUserSchema
+
+class UserController(ControllerBase):
+    auto_import = False
+
+    @http_get(
+        "/me",
+        permissions=[IsAuthenticated],
+        response={200: MyAuthUserSchema},
+        url_name="get_user",
+    )
+    def get_user(self):
+        return MyAuthUserSchema(user=self.context.request.auth)
+
+@api_controller("/auth", permissions=[AllowAny], tags=["auth"])
+class MyNinjaAuthController(
+    AuthenticationController,
+    PasswordResetController,
+    PasswordChangeController,
+    UserController
+):
+    auto_import = False
+
+```
+
+Then in your `api.py`, replace the default controller with your custom controller
+
+```python [api.py]
+from ninja_extra import NinjaExtraAPI
+from .controller import MyNinjaAuthController
+
+api = NinjaExtraAPI()
+api.register_controllers(MyNinjaAuthController)
 ```
