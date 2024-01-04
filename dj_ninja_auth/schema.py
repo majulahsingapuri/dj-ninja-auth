@@ -1,5 +1,6 @@
-from typing import Optional, Type
+from typing import Optional, Type, Union
 
+from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.forms import (
     PasswordChangeForm,
@@ -7,12 +8,21 @@ from django.contrib.auth.forms import (
     SetPasswordForm,
 )
 from django.contrib.auth.models import AbstractUser
-from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_str
-from django.utils.http import urlsafe_base64_decode as uid_decoder
 from ninja import ModelSchema, Schema
 from ninja_extra import exceptions
 from pydantic import EmailStr, SecretStr, model_validator
+
+allauth_enabled = "allauth" in settings.INSTALLED_APPS
+if allauth_enabled:
+    from allauth.account import app_settings as allauth_account_settings
+    from allauth.account.forms import default_token_generator
+    from allauth.account.utils import url_str_to_user_pk as uid_decoder
+
+    from .forms import AllAuthPasswordResetForm
+else:
+    from django.contrib.auth.tokens import default_token_generator
+    from django.utils.http import urlsafe_base64_decode as uid_decoder
 
 UserModel = get_user_model()
 
@@ -82,7 +92,20 @@ class LoginOutputSchema(SuccessMessageMixin):
 
 class LoginInputSchema(InputSchemaMixin):
     _user: Optional[AbstractUser] = None
-    username: str
+    if (
+        not allauth_enabled
+        or allauth_account_settings.AUTHENTICATION_METHOD
+        == allauth_account_settings.AuthenticationMethod.USERNAME
+    ):
+        username: str
+    elif (
+        allauth_account_settings.AUTHENTICATION_METHOD
+        == allauth_account_settings.AuthenticationMethod.EMAIL
+    ):
+        email: EmailStr
+    else:
+        username: Optional[str] = None
+        email: Optional[EmailStr] = None
     password: SecretStr
 
     @classmethod
@@ -92,10 +115,21 @@ class LoginInputSchema(InputSchemaMixin):
     @model_validator(mode="after")
     def check_user_exists(self):
         self._user = authenticate(
-            username=self.username, password=self.password.get_secret_value()
+            username=getattr(self, "username", None),
+            email=getattr(self, "email", None),
+            password=self.password.get_secret_value(),
         )
         if self._user is None:
             raise exceptions.AuthenticationFailed("Incorrect Credentials")
+        if (
+            allauth_enabled
+            and allauth_account_settings.EMAIL_VERIFICATION
+            == allauth_account_settings.EmailVerificationMethod.MANDATORY
+            and not self._user.emailaddress_set.filter(
+                email=self._user.email, verified=True
+            ).exists()
+        ):
+            raise exceptions.AuthenticationFailed("Email is not verified")
         return self
 
 
@@ -104,7 +138,12 @@ class LoginInputSchema(InputSchemaMixin):
 
 class PasswordResetRequestInputSchema(InputSchemaMixin):
     email: EmailStr
-    _form: Optional[PasswordResetForm] = None
+    _form: Optional[Union[PasswordResetForm, AllAuthPasswordResetForm]] = None
+
+    def get_form(self):
+        if allauth_enabled:
+            return AllAuthPasswordResetForm
+        return PasswordResetForm
 
     @classmethod
     def get_response_schema(cls) -> Type[Schema]:
@@ -112,9 +151,10 @@ class PasswordResetRequestInputSchema(InputSchemaMixin):
 
     @model_validator(mode="after")
     def check_email_form(self):
-        self._form = PasswordResetForm(self.dict())
+        form = self.get_form()
+        self._form = form(self.dict())
         if not self._form.is_valid():
-            raise exceptions.ValidationError("Incorrect Email Format")
+            raise exceptions.ValidationError(self._form.errors)
         return self
 
 
@@ -147,7 +187,7 @@ class PasswordResetConfirmInputSchema(PasswordResetBase):
             ),
         )
         if not self._form.is_valid():
-            raise exceptions.ValidationError("Password Validation Failed")
+            raise exceptions.ValidationError(self._form.errors)
         self._form.save()
         return self
 
@@ -169,6 +209,8 @@ class PasswordChangeInputSchema(PasswordResetBase):
         user = authenticate(
             username=self.username, password=self.old_password.get_secret_value()
         )
+        if not user:
+            raise exceptions.AuthenticationFailed()
         self._form = PasswordChangeForm(
             user,
             dict(
@@ -178,6 +220,6 @@ class PasswordChangeInputSchema(PasswordResetBase):
             ),
         )
         if not self._form.is_valid():
-            raise exceptions.ValidationError("Form Validation Failed")
+            raise exceptions.ValidationError(self._form.errors)
         self._form.save()
         return self

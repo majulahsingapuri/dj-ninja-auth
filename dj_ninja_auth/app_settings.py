@@ -9,6 +9,7 @@ class AppSettings(object):
         assert isinstance(self.PASSWORD_CHANGE_SCHEMA, str)
         assert isinstance(self.PASSWORD_RESET_REQUEST_SCHEMA, str)
         assert isinstance(self.PASSWORD_RESET_CONFIRM_SCHEMA, str)
+        assert isinstance(self.PASSWORD_RESET_URL, str)
 
     def _setting(self, name, default):
         return getattr(settings, self.prefix + name, default)
@@ -44,6 +45,10 @@ class AppSettings(object):
         return self._setting(
             "PASSWORD_CHANGE_SCHEMA", "dj_ninja_auth.schema.PasswordChangeInputSchema"
         )
+
+    @property
+    def PASSWORD_RESET_URL(self) -> str:
+        return self._setting("PASSWORD_RESET_URL", None)
 
 
 _app_settings = AppSettings("NINJA_AUTH_")
