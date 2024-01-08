@@ -1,4 +1,4 @@
-from typing import Optional, Type, Union
+from typing import Optional, Type
 
 from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model
@@ -8,6 +8,7 @@ from django.contrib.auth.forms import (
     SetPasswordForm,
 )
 from django.contrib.auth.models import AbstractUser
+from django.forms import Form
 from django.utils.encoding import force_str
 from ninja import ModelSchema, Schema
 from ninja_extra import exceptions
@@ -138,7 +139,7 @@ class LoginInputSchema(InputSchemaMixin):
 
 class PasswordResetRequestInputSchema(InputSchemaMixin):
     email: EmailStr
-    _form: Optional[Union[PasswordResetForm, AllAuthPasswordResetForm]] = None
+    _form: Optional[Form] = None
 
     def get_form(self):
         if allauth_enabled:

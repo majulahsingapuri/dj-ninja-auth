@@ -1,4 +1,6 @@
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
+from pydantic import HttpUrl, TypeAdapter, ValidationError
 
 
 class AppSettings(object):
@@ -10,6 +12,11 @@ class AppSettings(object):
         assert isinstance(self.PASSWORD_RESET_REQUEST_SCHEMA, str)
         assert isinstance(self.PASSWORD_RESET_CONFIRM_SCHEMA, str)
         assert isinstance(self.PASSWORD_RESET_URL, str)
+        adapter = TypeAdapter(HttpUrl)
+        try:
+            adapter.validate_python(self.PASSWORD_RESET_URL)
+        except ValidationError:
+            raise ImproperlyConfigured("PASSWORD_RESET_URL is not a valid URL")
 
     def _setting(self, name, default):
         return getattr(settings, self.prefix + name, default)

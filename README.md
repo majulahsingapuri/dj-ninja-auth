@@ -51,42 +51,6 @@ The endpoints are
 - `/auth/password/reset/confirm`
 - `/auth/password/change`
 
-#### Password Reset Template
-
-Django's default email template requires a `password_reset_confirm` reverse url that is incompatible with Django Ninja's [namespace convention](https://django-ninja.dev/guides/urls/) and will throw [this error](https://github.com/iMerica/dj-rest-auth/issues/494) if not handled properly.
-As a workaround, it is required that you provide your own email reset template.
-You can place it anywhere in your project as long as you link it in your `settings.py`'s `TEMPLATES` variable.
-In my example below, I have put it in the `{$project_root}/templates/` directory.
-
-```python [settings.py]
-TEMPLATES = [
-    {
-        "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "templates"],
-        "APP_DIRS": True,
-        "OPTIONS": { ... },
-    },
-]
-```
-
-In your `templates` directory, create the following file at `templates/registration/password_reset_email.html` and **minimally** add the following.
-
-```jinja [password_reset_email.html]
-{% load i18n %}
-{% autoescape off %}
-
-    {% translate "Please go to the following page and choose a new password:" %}
-
-    {% block reset_link %}
-        http://{YOUR_DOMAIN_HERE}/{YOUR_FRONTEND_PASSWORD_RESET_ENDPOINT}?uid={{ uid }}&token={{ token }}
-    {% endblock %}
-
-{% endautoescape %}
-```
-
-**NOTE**: Replace `YOUR_DOMAIN_HERE` and `YOUR_FRONTEND_PASSWORD_RESET_ENDPOINT` with values that correspond to your setup.
-The `uid` and `token` variables have to be passed to the backend for verification before the password can be changed.
-
 ## Authentication
 
 There are 3 controllers that you can register in your `api.py` file for your application depending on your authentication needs.

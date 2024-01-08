@@ -9,6 +9,7 @@ from ninja_extra import (
 )
 from ninja_extra.permissions import AllowAny, IsAuthenticated
 
+from . import app_settings
 from .schema import AuthUserSchema
 from .schema_control import SchemaControl
 
@@ -56,7 +57,10 @@ class PasswordResetController(ControllerBase):
     def password_reset_request(
         self, reset_request: schema.password_reset_request_schema
     ):
-        reset_request._form.save(request=self.context.request)
+        reset_request._form.save(
+            request=self.context.request,
+            extra_email_context={"password_reset_url": app_settings.PASSWORD_RESET_URL},
+        )
         return reset_request.to_response_schema()
 
     @http_post(

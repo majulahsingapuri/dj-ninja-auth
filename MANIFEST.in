@@ -1,1 +1,2 @@
 include README.md
+recursive-include dj_ninja_auth *.html
