@@ -3,7 +3,7 @@ from typing import Type
 from django.utils.module_loading import import_string
 
 from . import app_settings
-from .schema import InputSchemaMixin, SuccessMessageMixin
+from .schema import AuthUserSchema, InputSchemaMixin, SuccessMessageMixin
 
 
 class SchemaControl:
@@ -45,6 +45,13 @@ class SchemaControl:
             "NINJA_AUTH_PASSWORD_CHANGE_SCHEMA",
         )
 
+        self._auth_user_schema = import_string(app_settings.AUTH_USER_SCHEMA)
+        self.validate_type(
+            self._auth_user_schema,
+            AuthUserSchema,
+            "NINJA_AUTH_AUTH_USER_SCHEMA",
+        )
+
     def validate_type(
         self, schema_type: Type, sub_class: Type, settings_key: str
     ) -> None:
@@ -70,3 +77,7 @@ class SchemaControl:
     @property
     def password_change_schema(self) -> "InputSchemaMixin":
         return self._password_change_schema
+
+    @property
+    def auth_user_schema(self) -> "AuthUserSchema":
+        return self._auth_user_schema

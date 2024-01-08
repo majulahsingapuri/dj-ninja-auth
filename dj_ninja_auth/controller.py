@@ -10,7 +10,6 @@ from ninja_extra import (
 from ninja_extra.permissions import AllowAny, IsAuthenticated
 
 from . import app_settings
-from .schema import AuthUserSchema
 from .schema_control import SchemaControl
 
 schema = SchemaControl()
@@ -94,7 +93,7 @@ class UserController(ControllerBase):
     @http_get(
         "/me",
         permissions=[IsAuthenticated],
-        response={200: AuthUserSchema},
+        response={200: schema.auth_user_schema},
         url_name="get_user",
     )
     def get_me(self):

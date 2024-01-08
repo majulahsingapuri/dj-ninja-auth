@@ -54,6 +54,10 @@ class AppSettings(object):
         )
 
     @property
+    def AUTH_USER_SCHEMA(self) -> str:
+        return self._setting("AUTH_USER_SCHEMA", "dj_ninja_auth.schema.AuthUserSchema")
+
+    @property
     def PASSWORD_RESET_URL(self) -> str:
         return self._setting("PASSWORD_RESET_URL", None)
 

@@ -87,6 +87,7 @@ class PasswordResetBase(InputSchemaMixin):
 # Login
 
 
+# TODO: restructure the code somehow such that there is no circular import and changing the schema_control will change this as well.
 class LoginOutputSchema(SuccessMessageMixin):
     user: AuthUserSchema
 
@@ -152,8 +153,7 @@ class PasswordResetRequestInputSchema(InputSchemaMixin):
 
     @model_validator(mode="after")
     def check_email_form(self):
-        form = self.get_form()
-        self._form = form(self.dict())
+        self._form = self.get_form()(self.dict())
         if not self._form.is_valid():
             raise exceptions.ValidationError(self._form.errors)
         return self
