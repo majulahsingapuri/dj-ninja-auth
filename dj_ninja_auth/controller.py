@@ -58,6 +58,7 @@ class PasswordResetController(ControllerBase):
     ):
         reset_request._form.save(
             request=self.context.request,
+            email_template_name="password/reset_email.html",
             extra_email_context={"password_reset_url": app_settings.PASSWORD_RESET_URL},
         )
         return reset_request.to_response_schema()
