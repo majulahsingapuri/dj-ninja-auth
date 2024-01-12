@@ -25,7 +25,7 @@ class AccountController(ControllerBase):
         url_name="create_user",
     )
     def post_create_user(self, new_user: registration_schema.create_user_schema):
-        return new_user._form.save()
+        return new_user.save(self.context.request)
 
     @http_patch(
         "/",

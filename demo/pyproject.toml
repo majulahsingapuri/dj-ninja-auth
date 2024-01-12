@@ -10,7 +10,7 @@ python = "^3.10"
 Django = "^5.0"
 pydantic = "^2.5.2"
 pydantic-settings = "^2.1.0"
-dj-ninja-auth = {path = "../dist/dj-ninja-auth-0.1.7.post16.tar.gz"}
+dj-ninja-auth = {path = "../dist/dj-ninja-auth-0.1.7.post18.tar.gz"}
 django-allauth = "^0.59.0"
 
 
