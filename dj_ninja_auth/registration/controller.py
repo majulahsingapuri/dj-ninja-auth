@@ -1,4 +1,10 @@
-from ninja_extra import ControllerBase, api_controller, http_patch, http_post
+from ninja_extra import (
+    ControllerBase,
+    api_controller,
+    http_delete,
+    http_patch,
+    http_post,
+)
 from ninja_extra.permissions import AllowAny, IsAuthenticated
 
 from ..schema_control import SchemaControl
@@ -34,6 +40,18 @@ class AccountController(ControllerBase):
                 setattr(user, k, v)
         user.save()
         return user
+
+    @http_delete(
+        "/",
+        response={200: schema.success_schema},
+        permissions=[IsAuthenticated],
+        url_name="delete_user",
+    )
+    def delete_user(self):
+        user = self.context.request.auth
+        user.is_active = False
+        user.save()
+        return schema.success_schema()
 
 
 @api_controller("/account", permissions=[IsAuthenticated], tags=["account"])
