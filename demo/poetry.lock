@@ -117,7 +117,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 
 [[package]]
 name = "dj-ninja-auth"
-version = "0.1.7.post10"
+version = "0.1.7.post15"
 description = "A Django app for REST Authentication using Django Ninja"
 category = "main"
 optional = false
@@ -135,7 +135,7 @@ allauth = ["django-allauth (>=0.59.0)"]
 
 [package.source]
 type = "file"
-url = "../dist/dj-ninja-auth-0.1.7.post10.tar.gz"
+url = "../dist/dj-ninja-auth-0.1.7.post15.tar.gz"
 
 [[package]]
 name = "Django"
@@ -629,7 +629,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "cbfdd4f99d87a805b4c3c3946052bc620229ccefba4dfc1a5e9892da79625ae7"
+content-hash = "f20d59bf133519ec26d1e11666e4799f02d4b914faef99817bc8904c9c04115d"
 
 [metadata.files]
 annotated-types = [
@@ -836,7 +836,7 @@ defusedxml = [
     {file = "defusedxml-0.7.1.tar.gz", hash = "sha256:1bb3032db185915b62d7c6209c5a8792be6a32ab2fedacc84e01b52c51aa3e69"},
 ]
 dj-ninja-auth = [
-    {file = "dj-ninja-auth-0.1.7.post10.tar.gz", hash = "sha256:01d876f776d1c69040af94d6840b16b35f9d951b5ad6a5af4bfa9aa6a53f01e9"},
+    {file = "dj-ninja-auth-0.1.7.post15.tar.gz", hash = "sha256:426a7df289ab7479c6cf77925c4b87d6899911b0c90df0f06e113aa2588afa01"},
 ]
 Django = [
     {file = "Django-5.0-py3-none-any.whl", hash = "sha256:3a9fd52b8dbeae335ddf4a9dfa6c6a0853a1122f1fb071a8d5eca979f73a05c8"},

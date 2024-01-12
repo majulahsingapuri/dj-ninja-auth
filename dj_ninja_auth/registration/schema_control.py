@@ -4,6 +4,7 @@ from django.utils.module_loading import import_string
 
 from ..schema import InputSchemaMixin
 from . import app_settings
+from .schema import UpdateUserSchema
 
 
 class RegistrationSchemaControl:
@@ -15,6 +16,13 @@ class RegistrationSchemaControl:
             "NINJA_AUTH_REGISTRATION_CREATE_USER_SCHEMA",
         )
 
+        self._update_user_schema = import_string(app_settings.UPDATE_USER_SCHEMA)
+        self.validate_type(
+            self._update_user_schema,
+            UpdateUserSchema,
+            "NINJA_AUTH_REGISTRATION_UPDATE_USER_SCHEMA",
+        )
+
     def validate_type(
         self, schema_type: Type, sub_class: Type, settings_key: str
     ) -> None:
@@ -24,3 +32,7 @@ class RegistrationSchemaControl:
     @property
     def create_user_schema(self) -> "InputSchemaMixin":
         return self._create_user_schema
+
+    @property
+    def update_user_schema(self) -> "InputSchemaMixin":
+        return self._update_user_schema

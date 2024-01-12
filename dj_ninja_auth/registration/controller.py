@@ -1,4 +1,4 @@
-from ninja_extra import ControllerBase, api_controller, http_post
+from ninja_extra import ControllerBase, api_controller, http_patch, http_post
 from ninja_extra.permissions import AllowAny, IsAuthenticated
 
 from ..schema_control import SchemaControl
@@ -20,6 +20,20 @@ class AccountController(ControllerBase):
     )
     def post_create_user(self, new_user: registration_schema.create_user_schema):
         return new_user._form.save()
+
+    @http_patch(
+        "/",
+        response={200: schema.auth_user_schema},
+        permissions=[IsAuthenticated],
+        url_name="update_user",
+    )
+    def patch_update_user(self, update_user: registration_schema.update_user_schema):
+        user = self.context.request.auth
+        for k, v in update_user.model_dump().items():
+            if v:
+                setattr(user, k, v)
+        user.save()
+        return user
 
 
 @api_controller("/account", permissions=[IsAuthenticated], tags=["account"])

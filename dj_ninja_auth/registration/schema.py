@@ -3,7 +3,7 @@ from typing import Optional
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
 from django.forms import Form
-from ninja import Schema
+from ninja import ModelSchema, Schema
 from ninja_extra import exceptions
 from pydantic import SecretStr, model_validator
 
@@ -42,3 +42,21 @@ class CreateUserSchema(InputSchemaMixin):
         if not self._form.is_valid():
             raise exceptions.ValidationError(self._form.errors)
         return self
+
+
+class UpdateUserSchema(ModelSchema):
+    class Meta:
+        model = UserModel
+        exclude = [
+            "username",
+            "email",
+            "password",
+            "id",
+            "last_login",
+            "is_superuser",
+            "is_staff",
+            "is_active",
+            "date_joined",
+            "groups",
+            "user_permissions",
+        ]

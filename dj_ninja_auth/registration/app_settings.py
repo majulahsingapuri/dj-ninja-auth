@@ -14,6 +14,12 @@ class AppSettings(object):
             "CREATE_USER_SCHEMA", "dj_ninja_auth.registration.schema.CreateUserSchema"
         )
 
+    @property
+    def UPDATE_USER_SCHEMA(self) -> str:
+        return self._setting(
+            "UPDATE_USER_SCHEMA", "dj_ninja_auth.registration.schema.UpdateUserSchema"
+        )
+
 
 _app_settings = AppSettings("NINJA_AUTH_REGISTRATION_")
 
