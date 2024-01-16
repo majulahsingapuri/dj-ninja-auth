@@ -20,6 +20,18 @@ class AppSettings(object):
             "UPDATE_USER_SCHEMA", "dj_ninja_auth.registration.schema.UpdateUserSchema"
         )
 
+    @property
+    def VERIFY_EMAIL_SCHEMA(self) -> str:
+        return self._setting(
+            "VERIFY_EMAIL_SCHEMA", "dj_ninja_auth.registration.schema.VerifyEmailSchema"
+        )
+
+    @property
+    def RESEND_EMAIL_SCHEMA(self) -> str:
+        return self._setting(
+            "RESEND_EMAIL_SCHEMA", "dj_ninja_auth.registration.schema.ResendEmailSchema"
+        )
+
 
 _app_settings = AppSettings("NINJA_AUTH_REGISTRATION_")
 

@@ -146,12 +146,14 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 SITE_ID = 1
 
 NINJA_AUTH_PASSWORD_RESET_URL = "http://localhost:8000/reset_password/"
+NINJA_AUTH_EMAIL_CONFIRMATION_URL = "http://localhost:8000/confirm-email/"
 
 NINJA_AUTH_JWT_SIGNING_KEY = config.signing_key
 NINJA_AUTH_JWT_VERIFYING_KEY = config.verifying_key
 NINJA_AUTH_JWT_ALGORITHM = "RS256"
 NINJA_AUTH_JWT_ACCESS_TOKEN_LIFETIME = timedelta(minutes=30)
 
+ACCOUNT_ADAPTER = "dj_ninja_auth.registration.adapter.NinjaAccountAdapter"
 ACCOUNT_AUTHENTICATION_METHOD = "username_email"
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"

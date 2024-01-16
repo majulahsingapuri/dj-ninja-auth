@@ -83,3 +83,27 @@ class UpdateUserSchema(ModelSchema):
             "groups",
             "user_permissions",
         ]
+
+
+class VerifyEmailSchema(InputSchemaMixin):
+    key: str
+
+    @classmethod
+    def get_response_schema(cls) -> type[Schema]:
+        return schema.success_schema
+
+
+class ResendEmailSchema(InputSchemaMixin):
+    email: EmailStr
+    _user: Optional[UserModel] = None
+
+    @classmethod
+    def get_response_schema(cls) -> type[Schema]:
+        return schema.success_schema
+
+    @model_validator(mode="after")
+    def check_user_exists(self):
+        self._user = UserModel.objects.filter(
+            emailaddress__email__iexact=self.email
+        ).first()
+        return self
