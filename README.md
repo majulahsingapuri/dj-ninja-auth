@@ -61,6 +61,12 @@ pip install dj-ninja-auth
     ]
     ```
 
+4. Add the following to your `settings.py`
+
+    ```python [settings.py]
+    NINJA_AUTH_PASSWORD_RESET_URL = "http://localhost:8000/<YOUR_PASSWORD_RESET_FRONTEND_URL>/"
+    ```
+
 This will give you 5 basic endpoints that are not secured and can be called by anyone.
 The endpoints are
 
@@ -205,6 +211,10 @@ MIDDLEWARE = (
     # Add the account middleware:
     "allauth.account.middleware.AccountMiddleware",
 )
+
+# The following is necessary to bypass the default templates
+ACCOUNT_ADAPTER = "dj_ninja_auth.registration.adapter.NinjaAccountAdapter"
+NINJA_AUTH_EMAIL_CONFIRMATION_URL = "http://localhost:8000/confirm-email/"
 ```
 
 **NOTE:** You do not need to include the allauth URLs in your `urls.py` as the functionality will automatically be present in `dj-ninja-auth`.
