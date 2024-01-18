@@ -8,9 +8,28 @@ Fully Customisable to suit your needs.
 This repository does not fix any issues in SimpleJWT or django-ninja-jwt.
 It is intended to build upon the repository and add other forms of authentication on top of just JWTs
 
+- [Django Ninja Auth](#django-ninja-auth)
+  - [Getting Started](#getting-started)
+    - [Installation](#installation)
+    - [Setup](#setup)
+      - [NinjaAPI](#ninjaapi)
+  - [Authentication](#authentication)
+    - [Session](#session)
+    - [Token](#token)
+    - [JWT](#jwt)
+  - [Registration](#registration)
+  - [Allauth](#allauth)
+    - [Installation](#installation-1)
+    - [Social Authentication](#social-authentication)
+  - [Customisation](#customisation)
+    - [Schema](#schema)
+    - [Controller](#controller)
+
 ## Getting Started
 
 ### Installation
+
+To install the base library, run the following command:
 
 ```bash
 pip install dj-ninja-auth
@@ -73,7 +92,7 @@ api.register_controllers(NinjaAuthDefaultController)
 
 Since the `token`s will be stored in the database, you are required to add the `dj_ninja_auth.authtoken` app to your `INSTALLED_APPS` and migrate the database.
 
-```python
+```python [api.py]
 from ninja_extra import NinjaExtraAPI
 from dj_ninja_auth.authtoken.authentication import AccessTokenAuth
 from dj_ninja_auth.authtoken.controller import NinjaAuthTokenController
@@ -84,7 +103,7 @@ api.register_controllers(NinjaAuthTokenController)
 
 ### JWT
 
-```python
+```python [api.py]
 from ninja_extra import NinjaExtraAPI
 from dj_ninja_auth.jwt.authentication import JWTAuth
 from dj_ninja_auth.jwt.controller import NinjaAuthJWTController
@@ -97,6 +116,141 @@ The JWT controller provides 2 additional endpoints for tokens.
 
 - `/auth/refresh`
 - `/auth/verify`
+
+## Registration
+
+To manage accounts in addition to the authentication functionality, use the `NinjaAuthAccountController` as below:
+
+```python [api.py]
+from ninja_extra import NinjaExtraAPI
+
+from dj_ninja_auth.jwt.authentication import JWTAuth
+from dj_ninja_auth.jwt.controller import NinjaAuthJWTController
+from dj_ninja_auth.registration.controller import NinjaAuthAccountController
+
+api = NinjaExtraAPI(auth=[JWTAuth()], csrf=True)
+api.register_controllers(NinjaAuthJWTController, NinjaAuthAccountController)
+```
+
+This will provide the following endpoints.
+
+- `/account/`: Allowed methods are `POST`, `PATCH` and `DELETE`.
+- `/account/verify`
+- `/account/resend-email`
+
+## Allauth
+
+This library is fully compatible with `allauth`, albeit there are some modifications to work in a REST-ful format.
+
+### Installation
+
+To include the `allauth` library for additional account management and social authentication, run the following command:
+
+```bash
+pip install dj-ninja-auth[allauth]
+```
+
+Add the following to your `settings.py`.
+
+```python [settings.py]
+# Specify the context processors as follows:
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                # Already defined Django-related contexts here
+
+                # `allauth` needs this from django
+                'django.template.context_processors.request',
+            ],
+        },
+    },
+]
+
+AUTHENTICATION_BACKENDS = [
+    ...
+    # Needed to login by username in Django admin, regardless of `allauth`
+    'django.contrib.auth.backends.ModelBackend',
+
+    # `allauth` specific authentication methods, such as login by email
+    'allauth.account.auth_backends.AuthenticationBackend',
+    ...
+]
+
+INSTALLED_APPS = [
+    ...
+    # The following apps are required:
+    'django.contrib.auth',
+    'django.contrib.messages',
+
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    # ... include the providers you want to enable:
+    'allauth.socialaccount.providers.agave',
+    'allauth.socialaccount.providers.amazon',
+    ...
+]
+
+MIDDLEWARE = (
+    "django.middleware.common.CommonMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+
+    # Add the account middleware:
+    "allauth.account.middleware.AccountMiddleware",
+)
+```
+
+**NOTE:** You do not need to include the allauth URLs in your `urls.py` as the functionality will automatically be present in `dj-ninja-auth`.
+
+Once you have configured your `settings.py`, run the migrate command to add all the `allauth` migrations to your database.
+
+```bash
+python manage.py migrate
+```
+
+### Social Authentication
+
+Social Authentication requires that you set up a [CSRF endpoint](#session) as this is required by `allauth`'s authentication endpoints.
+
+You will then have to register your app in the `admin` console. Do remember to add the provdier to the `INSTALLED_APPS` else your provider will not show up in the admin console.
+
+The next step is to set up your `urls.py` file so that the registered providers' urls are available.
+To do so, add the following to your `urls.py`.
+You can use any url prefix.
+I chose to use the `social/` prefix for ease of use and to deconflict it with the `account/` url in the `NinjaAuthAccountController`.
+
+```python [urls.py]
+from django.contrib import admin
+from django.urls import include, path
+
+from .api import api
+
+from allauth.urls import provider_urlpatterns # <-----
+
+urlpatterns = [
+    path("admin/", admin.site.urls),
+    path("social/", include(provider_urlpatterns)), # <-----
+    path("", api.urls),
+]
+```
+
+After getting your CSRF token, setting up your `url.py` and registering your `SocialApplication`, you have to send a `X-WWW-FORM-URLENCODED` request to your desired provider's login endpoint.
+A sample request is provided below.
+Take note of the callback urls as stated in the `allauth` documentation.
+
+```curl
+curl --location 'http://127.0.0.1:8000/social/<PROVIDER>/login/' \
+--header 'Cookie: csrftoken=<CSRF_TOKEN_VALUE>' \
+--header 'Content-Type: application/x-www-form-urlencoded' \
+--data-urlencode 'csrfmiddlewaretoken=<CSRF_TOKEN_VALUE>'
+```
 
 ## Customisation
 
