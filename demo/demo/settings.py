@@ -49,6 +49,8 @@ INSTALLED_APPS = [
     "dj_ninja_auth.jwt",
     "allauth",
     "allauth.account",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.github",
 ]
 
 MIDDLEWARE = [
