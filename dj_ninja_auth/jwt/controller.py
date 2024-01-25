@@ -25,6 +25,14 @@ class JWTAuthenticationController(AuthenticationController):
         url_name="login",
     )
     def login(self, credentials: jwt_schema.pair_schema):
+        """Logs in a user
+
+        Args:
+            credentials (schema.login_schema): The log in Credentials, typically username and/or email, and password
+
+        Returns:
+            JSON: A JSON object with the user's details
+        """
         credentials.post_validate_schema()
         django_login(self.context.request, credentials._user)
         kwargs = {
@@ -44,6 +52,14 @@ class JWTTokenVerificationController(ControllerBase):
         url_name="token_verify",
     )
     def verify_token(self, token: jwt_schema.verify_schema):
+        """Verifies that the provided token is valid.
+
+        Args:
+            token (jwt_schema.verify_schema): The `access` or `refresh` token.
+
+        Returns:
+            JSON: A success object if the token is valid.
+        """
         return token.to_response_schema()
 
 
@@ -54,8 +70,17 @@ class JWTTokenRefreshController(ControllerBase):
         "/refresh",
         response={200: jwt_schema.refresh_schema.get_response_schema()},
         url_name="token_refresh",
+        auth=None,
     )
     def refresh_token(self, token: jwt_schema.refresh_schema):
+        """Consumes a refresh token and returns a new `access`, `refresh` token pair.
+
+        Args:
+            token (jwt_schema.refresh_schema): The `refresh` token.
+
+        Returns:
+            JSON: A JSON object with the new tokens
+        """
         return token.to_response_schema()
 
 

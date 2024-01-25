@@ -23,6 +23,14 @@ class TokenAuthenticationController(AuthenticationController):
         url_name="login",
     )
     def login(self, credentials: schema.token_login_schema):
+        """Logs in a user
+
+        Args:
+            credentials (schema.login_schema): The log in Credentials, typically username and/or email, and password
+
+        Returns:
+            JSON: A JSON object with the user's details
+        """
         django_login(self.context.request, credentials._user)
         return credentials.to_response_schema(user=credentials._user)
 

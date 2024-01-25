@@ -52,6 +52,7 @@ class Token(models.Model):
         self.key = self.generate_key()
         self.save(update_fields=["key"])
 
+    # TODO: Need to make this not pseudo-random for security.
     @classmethod
     def generate_key(cls):
         return binascii.hexlify(os.urandom(20)).decode()

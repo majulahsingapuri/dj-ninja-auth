@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import Any, Optional, Tuple
 from uuid import uuid4
 
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractBaseUser
 from django.utils import timezone
 from django.utils.module_loading import import_string
@@ -9,6 +10,8 @@ from django.utils.module_loading import import_string
 from . import app_settings
 from .exceptions import TokenBackendError, TokenError
 from .utils import datetime_from_epoch, datetime_to_epoch
+
+UserModel = get_user_model()
 
 
 class Token:
@@ -103,6 +106,11 @@ class Token:
 
         if app_settings.TOKEN_TYPE_CLAIM is not None:
             self.verify_token_type()
+
+        if not UserModel.objects.filter(
+            id=self.payload[app_settings.USER_ID_CLAIM], is_active=True
+        ).exists():
+            raise TokenError("User is inactive")
 
     def verify_token_type(self) -> Any:
         """
