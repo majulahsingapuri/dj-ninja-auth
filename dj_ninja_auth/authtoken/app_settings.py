@@ -27,7 +27,7 @@ class AppSettings(object):
         )
 
 
-_app_settings = AppSettings("NINJA_AUTH_TOKEN_")
+_app_settings = AppSettings("AUTH_TOKEN_")
 
 
 def __getattr__(name: str):

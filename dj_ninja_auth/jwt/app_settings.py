@@ -122,7 +122,7 @@ class AppSettings(object):
         return self._setting("REFRESH_TOKEN_LIFETIME", timedelta(days=1))
 
 
-_app_settings = AppSettings("NINJA_AUTH_JWT_")
+_app_settings = AppSettings("AUTH_JWT_")
 
 
 def __getattr__(name: str):

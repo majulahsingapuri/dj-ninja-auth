@@ -12,16 +12,11 @@ class AppSettings(object):
         assert isinstance(self.PASSWORD_RESET_REQUEST_SCHEMA, str)
         assert isinstance(self.PASSWORD_RESET_CONFIRM_SCHEMA, str)
         assert isinstance(self.PASSWORD_RESET_URL, str)
-        assert isinstance(self.EMAIL_CONFIRMATION_URL, str)
         adapter = TypeAdapter(HttpUrl)
         try:
             adapter.validate_python(self.PASSWORD_RESET_URL)
         except ValidationError:
             raise ImproperlyConfigured("PASSWORD_RESET_URL is not a valid URL")
-        try:
-            adapter.validate_python(self.EMAIL_CONFIRMATION_URL)
-        except ValidationError:
-            raise ImproperlyConfigured("EMAIL_CONFIRMATION_URL is not a valid URL")
 
     def _setting(self, name, default):
         return getattr(settings, self.prefix + name, default)
@@ -66,12 +61,8 @@ class AppSettings(object):
     def PASSWORD_RESET_URL(self) -> str:
         return self._setting("PASSWORD_RESET_URL", None)
 
-    @property
-    def EMAIL_CONFIRMATION_URL(self) -> str:
-        return self._setting("EMAIL_CONFIRMATION_URL", None)
 
-
-_app_settings = AppSettings("NINJA_AUTH_")
+_app_settings = AppSettings("AUTH_")
 
 
 def __getattr__(name: str):

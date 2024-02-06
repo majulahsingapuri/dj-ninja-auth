@@ -1,9 +1,17 @@
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
+from pydantic import HttpUrl, TypeAdapter, ValidationError
 
 
 class AppSettings(object):
     def __init__(self, prefix: str):
         self.prefix = prefix
+        adapter = TypeAdapter(HttpUrl)
+        assert isinstance(self.EMAIL_CONFIRMATION_URL, str)
+        try:
+            adapter.validate_python(self.EMAIL_CONFIRMATION_URL)
+        except ValidationError:
+            raise ImproperlyConfigured("EMAIL_CONFIRMATION_URL is not a valid URL")
 
     def _setting(self, name, default):
         return getattr(settings, self.prefix + name, default)
@@ -32,8 +40,12 @@ class AppSettings(object):
             "RESEND_EMAIL_SCHEMA", "dj_ninja_auth.registration.schema.ResendEmailSchema"
         )
 
+    @property
+    def EMAIL_CONFIRMATION_URL(self) -> str:
+        return self._setting("EMAIL_CONFIRMATION_URL", None)
 
-_app_settings = AppSettings("NINJA_AUTH_REGISTRATION_")
+
+_app_settings = AppSettings("REGISTRATION_")
 
 
 def __getattr__(name: str):
