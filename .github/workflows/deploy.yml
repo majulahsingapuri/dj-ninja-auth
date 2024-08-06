@@ -1,0 +1,23 @@
+name: deploy
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+jobs:
+    Deploy-to-PyPi:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repo
+              uses: actions/checkout@v4
+            - name: Setup Python
+              uses: actions/setup-python@v5
+              with:
+                python-version: '3.10.6' 
+                cache: 'pip'
+            - name: Install Twine
+              run: pip install twine
+            - name: Create deployment package
+              run: python setup.py sdist
+            - name: Push to PyPi
+              run: twine upload -u ${{ secrets.PYPI_USERNAME }} -p ${{ secrets.PYPI_TOKEN }} dist/dj-ninja-auth-${{ github.ref_name }}.tar.gz

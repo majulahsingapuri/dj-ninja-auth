@@ -1,6 +1,5 @@
 from typing import Optional, Type
 
-from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.forms import (
     PasswordChangeForm,
@@ -14,7 +13,8 @@ from ninja import ModelSchema, Schema
 from ninja_extra import exceptions
 from pydantic import EmailStr, SecretStr, model_validator
 
-allauth_enabled = "allauth" in settings.INSTALLED_APPS
+from . import allauth_enabled
+
 if allauth_enabled:
     from allauth.account import app_settings as allauth_account_settings
     from allauth.account.forms import default_token_generator
@@ -87,7 +87,8 @@ class PasswordResetBase(InputSchemaMixin):
 # Login
 
 
-# TODO: restructure the code somehow such that there is no circular import and changing the schema_control will change this as well.
+# TODO: restructure the code somehow such that there is no
+# circular import and changing the schema_control will change this as well.
 class LoginOutputSchema(SuccessMessageMixin):
     user: AuthUserSchema
 

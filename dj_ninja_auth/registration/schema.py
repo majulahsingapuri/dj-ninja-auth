@@ -1,6 +1,5 @@
 from typing import Optional
 
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
 from django.forms import Form
@@ -8,10 +7,10 @@ from ninja import ModelSchema, Schema
 from ninja_extra import exceptions
 from pydantic import EmailStr, SecretStr, model_validator
 
+from .. import allauth_enabled
 from ..schema import InputSchemaMixin
 from ..schema_control import SchemaControl
 
-allauth_enabled = "allauth" in settings.INSTALLED_APPS
 if allauth_enabled:
     from allauth.account import app_settings as allauth_account_settings
     from allauth.account.forms import SignupForm

@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "ninja_extra",
     "dj_ninja_auth",
     "dj_ninja_auth.jwt",
+    "dj_ninja_auth.registration",
     "allauth",
     "allauth.account",
     "allauth.socialaccount",

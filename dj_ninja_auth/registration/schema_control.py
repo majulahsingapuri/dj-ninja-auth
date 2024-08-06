@@ -15,7 +15,7 @@ class RegistrationSchemaControl:
         self.validate_type(
             self._create_user_schema,
             InputSchemaMixin,
-            "NINJA_AUTH_REGISTRATION_CREATE_USER_SCHEMA",
+            "REGISTRATION_CREATE_USER_SCHEMA",
         )
 
         self._update_user_schema = import_string(
@@ -24,7 +24,7 @@ class RegistrationSchemaControl:
         self.validate_type(
             self._update_user_schema,
             UpdateUserSchema,
-            "NINJA_AUTH_REGISTRATION_UPDATE_USER_SCHEMA",
+            "REGISTRATION_UPDATE_USER_SCHEMA",
         )
 
         self._verify_email_schema = import_string(
@@ -33,7 +33,7 @@ class RegistrationSchemaControl:
         self.validate_type(
             self._verify_email_schema,
             InputSchemaMixin,
-            "NINJA_AUTH_REGISTRATION_VERIFY_EMAIL_SCHEMA",
+            "REGISTRATION_VERIFY_EMAIL_SCHEMA",
         )
 
         self._resend_email_schema = import_string(
@@ -42,7 +42,7 @@ class RegistrationSchemaControl:
         self.validate_type(
             self._resend_email_schema,
             InputSchemaMixin,
-            "NINJA_AUTH_REGISTRATION_RESEND_EMAIL_SCHEMA",
+            "REGISTRATION_RESEND_EMAIL_SCHEMA",
         )
 
     def validate_type(

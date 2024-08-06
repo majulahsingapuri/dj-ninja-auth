@@ -56,8 +56,8 @@ class TokenBackend:
 
     def _validate_algorithm(self, algorithm) -> None:
         """
-        Ensure that the nominated algorithm is recognized, and that cryptography is installed for those
-        algorithms that require it
+        Ensure that the nominated algorithm is recognized, and that cryptography
+        is installed for those algorithms that require it
         """
         if algorithm not in ALLOWED_ALGORITHMS:
             raise TokenBackendError(f"Unrecognized algorithm type '{algorithm}'")

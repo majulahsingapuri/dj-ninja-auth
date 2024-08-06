@@ -17,15 +17,15 @@ class AppSettings(object):
         assert isinstance(self.JTI_CLAIM, str)
         assert isinstance(self.TOKEN_TYPE_CLAIM, str)
         assert isinstance(self.USER_AUTHENTICATION_RULE, str)
-        assert (isinstance(self.LEEWAY, (timedelta, int))) and not type(
-            self.LEEWAY
-        ) == bool
+        assert (isinstance(self.LEEWAY, (timedelta, int))) and not isinstance(
+            self.LEEWAY, bool
+        )
         assert isinstance(self.JWK_URL, (str, type(None)))
         assert isinstance(self.ISSUER, (str, type(None)))
         assert isinstance(self.AUDIENCE, (str, type(None)))
         assert isinstance(self.VERIFYING_KEY, (str, type(None)))
         assert isinstance(self.SIGNING_KEY, str)
-        assert type(self.UPDATE_LAST_LOGIN) == bool
+        assert isinstance(self.UPDATE_LAST_LOGIN, bool)
         assert isinstance(self.ALGORITHM, str)
         assert isinstance(self.ACCESS_TOKEN_LIFETIME, timedelta)
         assert isinstance(self.REFRESH_TOKEN_LIFETIME, timedelta)

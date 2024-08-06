@@ -1,8 +1,6 @@
-from django.conf import settings
-
+from .. import allauth_enabled
 from . import app_settings as registration_app_settings
 
-allauth_enabled = "allauth" in settings.INSTALLED_APPS
 if allauth_enabled:
     from allauth.account.adapter import DefaultAccountAdapter
 

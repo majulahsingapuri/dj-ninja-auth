@@ -61,6 +61,10 @@ class AppSettings(object):
     def PASSWORD_RESET_URL(self) -> str:
         return self._setting("PASSWORD_RESET_URL", None)
 
+    @property
+    def API_NAMESPACE(self) -> str:
+        return self._setting("API_NAMESPACE", "api-1.0.0")
+
 
 _app_settings = AppSettings("AUTH_")
 

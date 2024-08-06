@@ -1,4 +1,3 @@
-from django.conf import settings
 from ninja_extra import (
     ControllerBase,
     api_controller,
@@ -9,10 +8,10 @@ from ninja_extra import (
 )
 from ninja_extra.permissions import AllowAny, IsAuthenticated
 
+from .. import allauth_enabled
 from ..schema_control import SchemaControl
 from .schema_control import RegistrationSchemaControl
 
-allauth_enabled = "allauth" in settings.INSTALLED_APPS
 if allauth_enabled:
     from allauth.account import app_settings as allauth_account_settings
     from allauth.account.models import EmailConfirmation, EmailConfirmationHMAC
@@ -36,7 +35,9 @@ class AccountController(ControllerBase):
         """Creates a new user.
 
         Args:
-            new_user (registration_schema.create_user_schema): Credentials needed to create a new user, typically `username` and/or `email`, and 2 instances of the `password`.
+            new_user (registration_schema.create_user_schema): Credentials needed to
+            create a new user, typically `username` and/or `email`, and 2 instances
+            of the `password`.
 
         Returns:
             JSON: A JSON object depicting the newly created user.
@@ -60,7 +61,8 @@ class AccountController(ControllerBase):
         """Edits the current user's data.
 
         Args:
-            update_user (registration_schema.update_user_schema): The fields that are editable by the user. Defaults to `first_name` and `last_name`.
+            update_user (registration_schema.update_user_schema): The fields that are
+            editable by the user. Defaults to `first_name` and `last_name`.
 
         Returns:
             JSON: A JSON object depicting the updated user.
@@ -106,7 +108,8 @@ class AccountController(ControllerBase):
             """Verifies the user's email address.
 
             Args:
-                verify_email (registration_schema.verify_email_schema): The user's verification key that was sent to their email address.
+                verify_email (registration_schema.verify_email_schema): The user's
+                verification key that was sent to their email address.
 
             Raises:
                 exceptions.NotFound: The key provided was not found in the database.
@@ -141,7 +144,8 @@ class AccountController(ControllerBase):
             """Resends a verification email to the user for when the previous one has expired.
 
             Args:
-                resend_email (registration_schema.resend_email_schema): The email address of the user.
+                resend_email (registration_schema.resend_email_schema): The email
+                address of the user.
 
             Returns:
                 JSON: A success message regardless of the user email existing in the database.

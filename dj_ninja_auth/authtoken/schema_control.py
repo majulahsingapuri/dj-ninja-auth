@@ -11,7 +11,7 @@ class AuthTokenSchemaControl:
 
         self._token_login_schema = import_string(app_settings.LOGIN_SCHEMA)
         self.validate_type(
-            self._token_login_schema, InputSchemaMixin, "NINJA_AUTH_TOKEN_LOGIN_SCHEMA"
+            self._token_login_schema, InputSchemaMixin, "AUTH_TOKEN_LOGIN_SCHEMA"
         )
 
     def validate_type(

@@ -28,7 +28,8 @@ class JWTAuthenticationController(AuthenticationController):
         """Logs in a user
 
         Args:
-            credentials (schema.login_schema): The log in Credentials, typically username and/or email, and password
+            credentials (schema.login_schema): The log in Credentials,
+            typically username and/or email, and password
 
         Returns:
             JSON: A JSON object with the user's details

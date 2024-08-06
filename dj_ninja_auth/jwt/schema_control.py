@@ -12,14 +12,14 @@ class JWTSchemaControl:
 
         self._verify_schema = import_string(app_settings.VERIFY_SCHEMA)
         self.validate_type(
-            self._verify_schema, InputSchemaMixin, "NINJA_AUTH_JWT_VERIFY_SCHEMA"
+            self._verify_schema, InputSchemaMixin, "AUTH_JWT_VERIFY_SCHEMA"
         )
 
         self._pair_schema = import_string(app_settings.PAIR_SCHEMA)
         self.validate_type(
             self._pair_schema,
             JWTTokenInputSchemaMixin,
-            "NINJA_AUTH_JWT_PAIR_SCHEMA",
+            "AUTH_JWT_PAIR_SCHEMA",
         )
 
         self._refresh_schema = import_string(app_settings.REFRESH_SCHEMA)
@@ -27,7 +27,7 @@ class JWTSchemaControl:
         self.validate_type(
             self._refresh_schema,
             InputSchemaMixin,
-            "NINJA_AUTH_JWT_REFRESH_SCHEMA",
+            "AUTH_JWT_REFRESH_SCHEMA",
         )
 
     def validate_type(

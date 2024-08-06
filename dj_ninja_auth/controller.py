@@ -31,7 +31,8 @@ class AuthenticationController(ControllerBase):
         """Logs in a user
 
         Args:
-            credentials (schema.login_schema): The log in Credentials, typically username and/or email, and password
+            credentials (schema.login_schema): The log in Credentials, typically
+            username and/or email, and password
 
         Returns:
             JSON: A JSON object with the user's details
@@ -75,7 +76,8 @@ class PasswordResetController(ControllerBase):
             reset_request (schema.password_reset_request_schema): The user's email address
 
         Returns:
-            JSON: A success message to show confirmation of receipt of the request, regardless of the existence of the email in the database.
+            JSON: A success message to show confirmation of receipt of the request,
+            regardless of the existence of the email in the database.
         """
         reset_request._form.save(
             request=self.context.request,
@@ -96,7 +98,9 @@ class PasswordResetController(ControllerBase):
         """Resets the user's password
 
         Args:
-            reset_confirm (schema.password_reset_confirm_schema): The password reset parameters, typically the new credentials and a token that was sent to the user's email.
+            reset_confirm (schema.password_reset_confirm_schema): The password
+            reset parameters, typically the new credentials and a token that was
+            sent to the user's email.
 
         Returns:
             JSON: A success message to indicate the password was changed successfully.
@@ -117,7 +121,9 @@ class PasswordChangeController(ControllerBase):
         """A self-service for an authenticated user to change their own password
 
         Args:
-            passwords (schema.password_change_schema): The user's credentials such as their `username`, `old_password` and 2 entries of their `new_password`.
+            passwords (schema.password_change_schema): The user's credentials
+            such as their `username`, `old_password` and 2 entries of
+            their `new_password`.
 
         Returns:
             JSON: A success message to indicate the password has been changed successfully.
@@ -143,7 +149,8 @@ class UserController(ControllerBase):
         return self.context.request.auth
 
 
-# For session Authentication, requires `csrf=True`. See https://github.com/vitalik/django-ninja/issues/8
+# For session Authentication, requires `csrf=True`.
+# See https://github.com/vitalik/django-ninja/issues/8
 @api_controller("/auth", permissions=[AllowAny], tags=["auth"])
 class NinjaAuthDefaultController(
     AuthenticationController,
